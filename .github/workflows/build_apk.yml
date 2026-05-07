@@ -1,0 +1,93 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.24.0'
+
+jobs:
+  build:
+    name: Build APK (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [apk, appbundle]
+        include:
+          - target: apk
+            artifact_name: apk-release
+            build_cmd: flutter build apk --release --split-per-abi
+            output_path: build/app/outputs/flutter-apk/
+            file_pattern: '*.apk'
+          - target: appbundle
+            artifact_name: appbundle-release
+            build_cmd: flutter build appbundle --release
+            output_path: build/app/outputs/bundle/release/
+            file_pattern: '*.aab'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        continue-on-error: true
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings || true
+
+      - name: ${{ matrix.build_cmd }}
+        run: ${{ matrix.build_cmd }}
+
+      - name: Upload ${{ matrix.artifact_name }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.output_path }}${{ matrix.file_pattern }}
+          retention-days: 30
+
+      - name: Rename APKs with version
+        if: matrix.target == 'apk'
+        run: |
+          mkdir -p release
+          VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}' | tr '+' '_')
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk "release/chinese_stories_${VERSION}_armeabi-v7a.apk"
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk "release/chinese_stories_${VERSION}_arm64-v8a.apk"
+          cp build/app/outputs/flutter-apk/app-x86_64-release.apk "release/chinese_stories_${VERSION}_x86_64.apk"
+
+      - name: Upload renamed APKs
+        if: matrix.target == 'apk'
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-release-renamed
+          path: release/*.apk
+          retention-days: 30
+
+  summary:
+    name: Build Summary
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check build status
+        run: |
+          echo "## APK Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| APK (split per ABI) | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| AppBundle | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Artifacts available for download (30 days retention)." >> $GITHUB_STEP_SUMMARY

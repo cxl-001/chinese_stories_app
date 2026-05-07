@@ -1,0 +1,2 @@
+-keep class com.kidsstory.chinese_stories_app.** { *; }
+-keep class io.flutter.** { *; }

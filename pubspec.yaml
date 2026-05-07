@@ -1,0 +1,28 @@
+name: chinese_stories_app
+description: 儿童中国传统故事 App - 献给小宝贝的故事王国
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  just_audio: ^0.9.36
+  shared_preferences: ^2.2.2
+  provider: ^6.1.1
+  flutter_tts: ^4.0.2
+  audioplayers: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - stories/
+    - audio/
+    - assets/
