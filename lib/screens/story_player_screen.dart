@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../models/story.dart';
 import '../providers/app_provider.dart';
 import '../services/audio_service.dart';
-import '../services/tts_service.dart';
 
 class StoryPlayerScreen extends StatefulWidget {
   final Story story;
@@ -17,11 +16,11 @@ class StoryPlayerScreen extends StatefulWidget {
 
 class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   final AudioService _audio = AudioService();
-  final TtsService _tts = TtsService();
   final ScrollController _scrollCtrl = ScrollController();
 
   bool _isPlaying = false;
   bool _isLoading = true;
+  bool _greetingShown = false;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
   double _volume = 0.85;
@@ -30,17 +29,61 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _initPlayback();
+    _childName = context.read<AppProvider>().childName;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showGreeting());
+  }
+
+  void _showGreeting() {
+    if (_greetingShown) return;
+    _greetingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => PopScope(
+        canPop: false,
+        child: Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.auto_stories, size: 64, color: Color(0xFFFF9800)),
+                const SizedBox(height: 20),
+                Text(
+                  '$_childName小朋友，\n现在我们来听《${widget.story.title}》的故事！',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.5),
+                ),
+                const SizedBox(height: 28),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _initPlayback();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF9800),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  child: const Text('开始听故事'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _initPlayback() async {
-    _childName = context.read<AppProvider>().childName;
-
     await _audio.init();
     await _audio.setSpeed(0.9);
     await _audio.setVolume(_volume);
     await widget.story.loadContent();
-    await _tts.init();
 
     _audio.playerStateStream.listen((state) {
       if (mounted) {
@@ -64,11 +107,6 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
       });
     });
 
-    // TTS greeting first
-    await _tts.speakGreeting(_childName, widget.story.title);
-    await Future.delayed(const Duration(seconds: 4));
-
-    // Then play the story audio
     try {
       await _audio.playAsset('audio/${widget.story.audioFile}');
       setState(() { _isPlaying = true; _isLoading = false; });
@@ -85,7 +123,6 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   @override
   void dispose() {
     _audio.dispose();
-    _tts.stop();
     _scrollCtrl.dispose();
     super.dispose();
   }
