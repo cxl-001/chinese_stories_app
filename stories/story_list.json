@@ -49,6 +49,16 @@
     {"id": 47, "title": "曹冲称象", "category": "智慧故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_47.json", "audio_file": "story_47.mp3", "cover_color": "#81C784"},
     {"id": 48, "title": "孔融让梨", "category": "智慧故事", "estimated_minutes": 9, "age_range": "5-10岁", "file": "story_48.json", "audio_file": "story_48.mp3", "cover_color": "#A5D6A7"},
     {"id": 49, "title": "王羲之与鹅", "category": "历史故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_49.json", "audio_file": "story_49.mp3", "cover_color": "#78909C"},
-    {"id": 50, "title": "李白铁杵磨成针", "category": "智慧故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_50.json", "audio_file": "story_50.mp3", "cover_color": "#B0BEC5"}
+    {"id": 50, "title": "李白铁杵磨成针", "category": "智慧故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_50.json", "audio_file": "story_50.mp3", "cover_color": "#B0BEC5"},
+    {"id": 51, "title": "白龙马的故事", "category": "神话故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_51.json", "audio_file": "story_51.mp3", "cover_color": "#BBDEFB"},
+    {"id": 52, "title": "白龙马立功记", "category": "神话故事", "estimated_minutes": 11, "age_range": "5-10岁", "file": "story_52.json", "audio_file": "story_52.mp3", "cover_color": "#64B5F6"},
+    {"id": 53, "title": "白龙马与孙悟空", "category": "神话故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_53.json", "audio_file": "story_53.mp3", "cover_color": "#42A5F5"},
+    {"id": 54, "title": "白龙马归海", "category": "神话故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_54.json", "audio_file": "story_54.mp3", "cover_color": "#1E88E5"},
+    {"id": 55, "title": "熊出没之熊大熊二", "category": "民间故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_55.json", "audio_file": "story_55.mp3", "cover_color": "#8D6E63"},
+    {"id": 56, "title": "熊出没之光头强迷路", "category": "民间故事", "estimated_minutes": 10, "age_range": "5-10岁", "file": "story_56.json", "audio_file": "story_56.mp3", "cover_color": "#FFCC80"},
+    {"id": 57, "title": "熊出没之森林运动会", "category": "民间故事", "estimated_minutes": 11, "age_range": "5-10岁", "file": "story_57.json", "audio_file": "story_57.mp3", "cover_color": "#66BB6A"},
+    {"id": 58, "title": "熊出没之冬日奇遇", "category": "民间故事", "estimated_minutes": 11, "age_range": "5-10岁", "file": "story_58.json", "audio_file": "story_58.mp3", "cover_color": "#90CAF9"},
+    {"id": 59, "title": "熊出没之春天来了", "category": "民间故事", "estimated_minutes": 11, "age_range": "5-10岁", "file": "story_59.json", "audio_file": "story_59.mp3", "cover_color": "#A5D6A7"},
+    {"id": 60, "title": "熊出没之保护地球", "category": "民间故事", "estimated_minutes": 12, "age_range": "5-10岁", "file": "story_60.json", "audio_file": "story_60.mp3", "cover_color": "#4CAF50"}
   ]
 }
