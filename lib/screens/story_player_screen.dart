@@ -20,7 +20,6 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
 
   bool _isPlaying = false;
   bool _isLoading = true;
-  bool _greetingShown = false;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
   double _volume = 0.85;
@@ -30,53 +29,24 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   void initState() {
     super.initState();
     _childName = context.read<AppProvider>().childName;
-    WidgetsBinding.instance.addPostFrameCallback((_) => _showGreeting());
-  }
-
-  void _showGreeting() {
-    if (_greetingShown) return;
-    _greetingShown = true;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => PopScope(
-        canPop: false,
-        child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.auto_stories, size: 64, color: Color(0xFFFF9800)),
-                const SizedBox(height: 20),
-                Text(
-                  '$_childName小朋友，\n现在我们来听《${widget.story.title}》的故事！',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.5),
-                ),
-                const SizedBox(height: 28),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    _initPlayback();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF9800),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  child: const Text('开始听故事'),
-                ),
-              ],
-            ),
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '$_childName小朋友，现在我们来听《${widget.story.title}》的故事！',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
+          backgroundColor: const Color(0xFFFF9800),
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
-      ),
-    );
+      );
+      Future.delayed(const Duration(seconds: 3), () => _initPlayback());
+    });
   }
 
   Future<void> _initPlayback() async {
