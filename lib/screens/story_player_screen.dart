@@ -16,12 +16,10 @@ class StoryPlayerScreen extends StatefulWidget {
 
 class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   final AudioService _audio = AudioService();
-  final TtsService _tts = TtsService();
   final ScrollController _scrollCtrl = ScrollController();
 
   bool _isPlaying = false;
   bool _isLoading = true;
-  bool _hasGreeted = false;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
   double _volume = 1.0;
@@ -35,7 +33,6 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   Future<void> _initPlayback() async {
     await _audio.init();
     await widget.story.loadContent();
-    await _tts.init();
 
     _audio.playerStateStream.listen((state) {
       if (mounted) {
@@ -59,13 +56,6 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
       });
     });
 
-    if (!_hasGreeted) {
-      _hasGreeted = true;
-      final provider = context.read<AppProvider>();
-      await _tts.speakGreeting(provider.childName, widget.story.title);
-      await Future.delayed(const Duration(seconds: 3));
-    }
-
     try {
       await _audio.playAsset('audio/${widget.story.audioFile}');
       setState(() { _isPlaying = true; _isLoading = false; });
@@ -82,7 +72,6 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   @override
   void dispose() {
     _audio.dispose();
-    _tts.dispose();
     _scrollCtrl.dispose();
     super.dispose();
   }
