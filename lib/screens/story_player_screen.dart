@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/story.dart';
 import '../providers/app_provider.dart';
 import '../services/audio_service.dart';
+import '../services/tts_service.dart';
 
 class StoryPlayerScreen extends StatefulWidget {
   final Story story;
@@ -16,13 +17,15 @@ class StoryPlayerScreen extends StatefulWidget {
 
 class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   final AudioService _audio = AudioService();
+  final TtsService _tts = TtsService();
   final ScrollController _scrollCtrl = ScrollController();
 
   bool _isPlaying = false;
   bool _isLoading = true;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
-  double _volume = 1.0;
+  double _volume = 0.85;
+  String _childName = '小朋友';
 
   @override
   void initState() {
@@ -31,10 +34,13 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   }
 
   Future<void> _initPlayback() async {
+    _childName = context.read<AppProvider>().childName;
+
     await _audio.init();
     await _audio.setSpeed(0.9);
-    await _audio.setVolume(0.85);
+    await _audio.setVolume(_volume);
     await widget.story.loadContent();
+    await _tts.init();
 
     _audio.playerStateStream.listen((state) {
       if (mounted) {
@@ -54,10 +60,15 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
     _audio.durationStream.listen((dur) {
       if (mounted && dur != null) setState(() {
         _duration = dur;
-        _isLoading = false;
+        if (!_isPlaying) _isLoading = false;
       });
     });
 
+    // TTS greeting first
+    await _tts.speakGreeting(_childName, widget.story.title);
+    await Future.delayed(const Duration(seconds: 4));
+
+    // Then play the story audio
     try {
       await _audio.playAsset('audio/${widget.story.audioFile}');
       setState(() { _isPlaying = true; _isLoading = false; });
@@ -74,6 +85,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   @override
   void dispose() {
     _audio.dispose();
+    _tts.stop();
     _scrollCtrl.dispose();
     super.dispose();
   }
@@ -180,9 +192,8 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   }
 
   Widget _buildContent() {
-    final childName = context.read<AppProvider>().childName;
     final content = (widget.story.content ?? '')
-        .replaceAll('【NAME_PLACEHOLDER】', '$childName');
+        .replaceAll('【NAME_PLACEHOLDER】', _childName);
     final progressPercent = _duration.inMilliseconds > 0
         ? _position.inMilliseconds / _duration.inMilliseconds
         : 0.0;
