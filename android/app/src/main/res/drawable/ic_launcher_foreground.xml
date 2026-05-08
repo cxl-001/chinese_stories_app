@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 打开的书本 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,38 L54,48 L54,74 L34,64 Z"/>
+    <path
+        android:fillColor="#FFE0B2"
+        android:pathData="M54,48 L74,38 L74,64 L54,74 Z"/>
+    <!-- 书脊 -->
+    <path
+        android:fillColor="#FFCC80"
+        android:pathData="M52,47 L56,47 L56,75 L52,75 Z"/>
+</vector>
