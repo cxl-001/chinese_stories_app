@@ -32,6 +32,8 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
 
   Future<void> _initPlayback() async {
     await _audio.init();
+    await _audio.setSpeed(0.9);
+    await _audio.setVolume(0.85);
     await widget.story.loadContent();
 
     _audio.playerStateStream.listen((state) {
@@ -152,7 +154,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '${widget.story.category} · ${widget.story.durationText}',
+                  widget.story.category,
                   style: TextStyle(color: Colors.grey[500], fontSize: 13),
                 ),
               ],
@@ -178,7 +180,9 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
   }
 
   Widget _buildContent() {
-    final content = widget.story.content ?? '';
+    final childName = context.read<AppProvider>().childName;
+    final content = (widget.story.content ?? '')
+        .replaceAll('【NAME_PLACEHOLDER】', '$childName');
     final progressPercent = _duration.inMilliseconds > 0
         ? _position.inMilliseconds / _duration.inMilliseconds
         : 0.0;
@@ -275,40 +279,30 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Text(_formatDuration(_position),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey)),
-              Expanded(
-                child: SliderTheme(
-                  data: SliderThemeData(
-                    trackHeight: 4,
-                    thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 8),
-                    activeTrackColor: _storyColor,
-                    inactiveTrackColor: Colors.grey[200],
-                    thumbColor: _storyColor,
-                  ),
-                  child: Slider(
-                    value: _duration.inMilliseconds > 0
-                        ? _position.inMilliseconds
-                            .clamp(0, _duration.inMilliseconds)
-                            .toDouble()
-                        : 0,
-                    max: _duration.inMilliseconds > 0
-                        ? _duration.inMilliseconds.toDouble()
-                        : 1,
-                    onChanged: (v) {
-                      final pos = Duration(milliseconds: v.toInt());
-                      _audio.seek(pos);
-                      setState(() => _position = pos);
-                    },
-                  ),
-                ),
-              ),
-              Text(_formatDuration(_duration),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            ],
+          SliderTheme(
+            data: SliderThemeData(
+              trackHeight: 4,
+              thumbShape: const RoundSliderThumbShape(
+                  enabledThumbRadius: 8),
+              activeTrackColor: _storyColor,
+              inactiveTrackColor: Colors.grey[200],
+              thumbColor: _storyColor,
+            ),
+            child: Slider(
+              value: _duration.inMilliseconds > 0
+                  ? _position.inMilliseconds
+                      .clamp(0, _duration.inMilliseconds)
+                      .toDouble()
+                  : 0,
+              max: _duration.inMilliseconds > 0
+                  ? _duration.inMilliseconds.toDouble()
+                  : 1,
+              onChanged: (v) {
+                final pos = Duration(milliseconds: v.toInt());
+                _audio.seek(pos);
+                setState(() => _position = pos);
+              },
+            ),
           ),
           const SizedBox(height: 8),
           Row(

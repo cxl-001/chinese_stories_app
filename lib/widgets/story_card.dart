@@ -89,14 +89,6 @@ class StoryCard extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
-                  Row(
-                    children: [
-                      _buildTag(Icons.access_time, story.durationText),
-                      const SizedBox(width: 8),
-                      _buildTag(Icons.child_care, story.ageRange),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                   _buildTag(Icons.category, story.category),
                 ],
               ),
